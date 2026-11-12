@@ -1,0 +1,30 @@
+name: Extract website files for Vercel
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract uploaded website archive
+        run: |
+          if [ ! -f index.html ]; then
+            unzip -o recharge-subconscious-landing.zip
+            cp -a recharge-subconscious-landing/. .
+            rm -rf recharge-subconscious-landing
+          fi
+      - name: Commit extracted website files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Extract website files for Vercel deployment"
+            git push
+          fi
